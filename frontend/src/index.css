@@ -1,0 +1,226 @@
+/* Global styles for AI Personal Assistant */
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import 'bootstrap-icons/font/bootstrap-icons.css';
+
+:root {
+  --primary-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  --agent-bg: #f8fafc;
+  --agent-border: #e2e8f0;
+  --user-bubble: #4f46e5;
+  --user-text: #ffffff;
+  --bot-bubble: #ffffff;
+  --bot-text: #1e293b;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: #f1f5f9;
+  color: #1e293b;
+  min-height: 100vh;
+}
+
+.app-wrapper {
+  max-width: 960px;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header styling */
+.assistant-header {
+  background: var(--primary-gradient);
+  color: white;
+  border-radius: 0 0 16px 16px;
+  box-shadow: 0 4px 20px rgba(79, 70, 229, 0.2);
+}
+
+/* Chat container */
+.chat-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.messages-viewport {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 60vh;
+  min-height: 380px;
+  padding: 20px;
+  scroll-behavior: smooth;
+  background: #f8fafc;
+}
+
+/* Message styling */
+.message-row {
+  display: flex;
+  margin-bottom: 18px;
+  animation: fadeIn 0.25s ease-in-out;
+}
+
+.message-row.user-row {
+  justify-content: flex-end;
+}
+
+.message-row.bot-row {
+  justify-content: flex-start;
+}
+
+.message-bubble {
+  max-width: 80%;
+  padding: 14px 18px;
+  border-radius: 16px;
+  line-height: 1.55;
+  font-size: 0.95rem;
+  word-break: break-word;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.user-row .message-bubble {
+  background-color: var(--user-bubble);
+  color: var(--user-text);
+  border-bottom-right-radius: 4px;
+}
+
+.bot-row .message-bubble {
+  background-color: var(--bot-bubble);
+  color: var(--bot-text);
+  border: 1px solid var(--agent-border);
+  border-bottom-left-radius: 4px;
+}
+
+.message-time {
+  font-size: 0.72rem;
+  opacity: 0.7;
+  margin-top: 6px;
+  display: block;
+}
+
+/* Tool Badges */
+.tool-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  margin-bottom: 8px;
+}
+
+.tool-badge-calculator {
+  background-color: #e0e7ff;
+  color: #3730a3;
+  border: 1px solid #c7d2fe;
+}
+
+.tool-badge-dateTime {
+  background-color: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.tool-badge-taskManager {
+  background-color: #d1fae5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+/* Activity Banner */
+.activity-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.activity-step {
+  font-size: 0.85rem;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 0;
+}
+
+.activity-step i {
+  color: #10b981;
+  font-size: 0.95rem;
+}
+
+/* Quick prompt chips */
+.prompt-chip {
+  cursor: pointer;
+  background-color: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  border-radius: 18px;
+  padding: 6px 12px;
+  font-size: 0.82rem;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.prompt-chip:hover {
+  background-color: #e2e8f0;
+  border-color: #94a3b8;
+  transform: translateY(-1px);
+}
+
+/* Thinking loader animation */
+.dot-flashing {
+  position: relative;
+  width: 7px;
+  height: 7px;
+  border-radius: 5px;
+  background-color: #6366f1;
+  color: #6366f1;
+  animation: dot-flashing 1s infinite linear alternate;
+  animation-delay: 0.5s;
+  display: inline-block;
+  margin: 0 10px;
+}
+.dot-flashing::before, .dot-flashing::after {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  top: 0;
+}
+.dot-flashing::before {
+  left: -12px;
+  width: 7px;
+  height: 7px;
+  border-radius: 5px;
+  background-color: #6366f1;
+  color: #6366f1;
+  animation: dot-flashing 1s infinite alternate;
+  animation-delay: 0s;
+}
+.dot-flashing::after {
+  left: 12px;
+  width: 7px;
+  height: 7px;
+  border-radius: 5px;
+  background-color: #6366f1;
+  color: #6366f1;
+  animation: dot-flashing 1s infinite alternate;
+  animation-delay: 1s;
+}
+
+@keyframes dot-flashing {
+  0% { background-color: #6366f1; }
+  50%, 100% { background-color: #e0e7ff; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
