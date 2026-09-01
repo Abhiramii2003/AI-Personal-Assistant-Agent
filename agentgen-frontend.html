@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Personal Assistant Agent</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🤖</text></svg>" />
+  <!-- Bootstrap 5 CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Bootstrap Icons -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+  <!-- Custom Styles -->
+    <!-- Embedded Styles from style.css -->
+  <style>
+/* AI Personal Assistant Stylesheet */
+:root {
+  --primary-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  --agent-border: #e2e8f0;
+  --user-bubble: #4f46e5;
+  --user-text: #ffffff;
+  --bot-bubble: #ffffff;
+  --bot-text: #1e293b;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: #f1f5f9;
+  color: #1e293b;
+  min-height: 100vh;
+}
+
+.app-wrapper {
+  max-width: 960px;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.assistant-header {
+  background: var(--primary-gradient);
+  color: white;
+  border-radius: 0 0 16px 16px;
+  box-shadow: 0 4px 20px rgba(79, 70, 229, 0.2);
+}
+
+/* Chat container */
+.chat-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 25px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.messages-viewport {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 60vh;
+  min-height: 380px;
+  padding: 20px;
+  scroll-behavior: smooth;
+  background: #f8fafc;
+}
+
+/* Message styling */
+.message-row {
+  display: flex;
+  margin-bottom: 18px;
+  animation: fadeIn 0.25s ease-in-out;
+}
+
+.message-row.user-row {
+  justify-content: flex-end;
+}
+
+.message-row.bot-row {
+  justify-content: flex-start;
+}
+
+.message-bubble {
+  max-width: 80%;
+  padding: 14px 18px;
+  border-radius: 16px;
+  line-height: 1.55;
+  font-size: 0.95rem;
+  word-break: break-word;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.user-row .message-bubble {
+  background-color: var(--user-bubble);
+  color: var(--user-text);
+  border-bottom-right-radius: 4px;
+}
+
+.bot-row .message-bubble {
+  background-color: var(--bot-bubble);
+  color: var(--bot-text);
+  border: 1px solid var(--agent-border);
+  border-bottom-left-radius: 4px;
+}
+
+.message-time {
+  font-size: 0.72rem;
+  opacity: 0.7;
+  margin-top: 6px;
+  display: block;
+}
+
+/* Tool Badges */
+.tool-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 20px;
+  margin-bottom: 8px;
+}
+
+.tool-badge-calculator {
+  background-color: #e0e7ff;
+  color: #3730a3;
+  border: 1px solid #c7d2fe;
+}
+
+.tool-badge-dateTime {
+  background-color: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
+}
+
+.tool-badge-taskManager {
+  background-color: #d1fae5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+}
+
+/* Activity Card */
+.activity-card {
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+}
+
+.activity-step {
+  font-size: 0.85rem;
+  color: #475569;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 3px 0;
+}
+
+.activity-step i {
+  color: #10b981;
+  font-size: 0.95rem;
+}
+
+/* Quick prompt chips */
+.prompt-chip {
+  cursor: pointer;
+  background-color: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+  border-radius: 18px;
+  padding: 6px 12px;
+  font-size: 0.82rem;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.prompt-chip:hover {
+  background-color: #e2e8f0;
+  border-color: #94a3b8;
+  transform: translateY(-1px);
+}
+
+/* Thinking loader animation */
+.dot-flashing {
+  position: relative;
+  width: 7px;
+  height: 7px;
+  border-radius: 5px;
+  background-color: #6366f1;
+  color: #6366f1;
+  animation: dot-flashing 1s infinite linear alternate;
+  animation-delay: 0.5s;
+  display: inline-block;
+  margin: 0 10px;
+}
+.dot-flashing::before, .dot-flashing::after {
+  content: "";
+  display: inline-block;
+  position: absolute;
+  top: 0;
+}
+.dot-flashing::before {
+  left: -12px;
+  width: 7px;
+  height: 7px;
+  border-radius: 5px;
+  background-color: #6366f1;
+  color: #6366f1;
+  animation: dot-flashing 1s infinite alternate;
+  animation-delay: 0s;
+}
+.dot-flashing::after {
+  left: 12px;
+  width: 7px;
+  height: 7px;
+  border-radius: 5px;
+  background-color: #6366f1;
+  color: #6366f1;
+  animation: dot-flashing 1s infinite alternate;
+  animation-delay: 1s;
+}
+
+@keyframes dot-flashing {
+  0% { background-color: #6366f1; }
+  50%, 100% { background-color: #e0e7ff; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+  </style>
+</head>
+<body>
+  <div class="app-wrapper py-3 px-2 px-md-4">
+    <!-- Header -->
+    <header class="assistant-header p-4 mb-3">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+        <div class="d-flex align-items-center gap-3">
+          <div class="bg-white text-primary rounded-3 p-2 d-flex align-items-center justify-content-center shadow-sm" style="width: 44px; height: 44px;">
+            <i class="bi bi-robot fs-4"></i>
+          </div>
+          <div>
+            <h1 class="h4 mb-0 fw-bold">AI Personal Assistant</h1>
+            <p class="mb-0 small opacity-75">HTML + Node.js Agent Orchestrator with Tools</p>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-2">
+          <span class="badge bg-white text-primary px-3 py-2 rounded-pill shadow-sm">
+            <span class="spinner-grow spinner-grow-sm text-success me-1" style="width: 8px; height: 8px;" role="status"></span>
+            Agent Active
+          </span>
+          <button id="clearChatBtn" class="btn btn-outline-light btn-sm rounded-pill px-3" title="Clear Conversation">
+            <i class="bi bi-trash3 me-1"></i> Clear
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Chat Container -->
+    <main class="chat-container">
+      <!-- Agent Activity Stepper Panel -->
+      <div id="activityPanelContainer" class="px-3 pt-3 d-none">
+        <div class="activity-card p-3 mb-2 shadow-sm border-start border-primary border-4">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <div class="d-flex align-items-center gap-2">
+              <i class="bi bi-diagram-3-fill text-primary fs-5"></i>
+              <span class="fw-semibold text-dark small">Agent Activity & Orchestration Trace</span>
+            </div>
+            <span id="activityToolBadge" class="badge bg-light text-dark border d-none"></span>
+          </div>
+          <div id="activityStepsList" class="d-flex flex-column gap-1"></div>
+        </div>
+      </div>
+
+      <!-- Messages Viewport -->
+      <div id="messagesViewport" class="messages-viewport">
+        <!-- Welcome Screen (Shown when messages are empty) -->
+        <div id="welcomeBanner" class="text-center py-5 text-muted">
+          <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-inline-flex p-4 mb-3">
+            <i class="bi bi-robot fs-1"></i>
+          </div>
+          <h5 class="fw-bold text-dark">Welcome to your Personal AI Assistant!</h5>
+          <p class="small text-muted mx-auto" style="max-width: 450px;">
+            I am an intelligent AI Agent with planning and tool capabilities. I can perform exact math calculations, check the date/time, manage your task list, and converse naturally.
+          </p>
+
+          <div class="row g-2 justify-content-center mt-3 mx-auto" style="max-width: 600px;">
+            <div class="col-12 col-md-4">
+              <div class="p-3 bg-white rounded border shadow-sm h-100">
+                <i class="bi bi-calculator text-primary fs-4 d-block mb-1"></i>
+                <span class="fw-semibold small d-block">Calculator</span>
+                <span class="text-muted" style="font-size: 0.75rem;">Math & Percentages</span>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="p-3 bg-white rounded border shadow-sm h-100">
+                <i class="bi bi-calendar-check text-warning fs-4 d-block mb-1"></i>
+                <span class="fw-semibold small d-block">Date & Time</span>
+                <span class="text-muted" style="font-size: 0.75rem;">Current time & days</span>
+              </div>
+            </div>
+            <div class="col-12 col-md-4">
+              <div class="p-3 bg-white rounded border shadow-sm h-100">
+                <i class="bi bi-list-task text-success fs-4 d-block mb-1"></i>
+                <span class="fw-semibold small d-block">Task Manager</span>
+                <span class="text-muted" style="font-size: 0.75rem;">Add, list, complete tasks</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Input Area & Prompt Chips -->
+      <div class="p-3 border-top bg-white">
+        <!-- Quick Prompt Suggestion Chips -->
+        <div class="d-flex align-items-center gap-2 overflow-auto pb-2 mb-2" style="scrollbar-width: none;">
+          <span class="text-muted small flex-shrink-0">
+            <i class="bi bi-lightbulb-fill text-warning me-1"></i>Try:
+          </span>
+          <button class="prompt-chip btn btn-sm" data-prompt="What is 25 * 48?">What is 25 * 48?</button>
+          <button class="prompt-chip btn btn-sm" data-prompt="What is today's date?">What is today's date?</button>
+          <button class="prompt-chip btn btn-sm" data-prompt="Add Learn JavaScript to my tasks">Add Learn JavaScript to my tasks</button>
+          <button class="prompt-chip btn btn-sm" data-prompt="Show my tasks">Show my tasks</button>
+          <button class="prompt-chip btn btn-sm" data-prompt="Explain what an AI agent is">Explain what an AI agent is</button>
+        </div>
+
+        <!-- Chat Form -->
+        <form id="chatForm" class="d-flex gap-2">
+          <input
+            id="messageInput"
+            type="text"
+            class="form-control form-control-lg fs-6"
+            placeholder="Type your message... (e.g., What is 25 * 48?)"
+            autocomplete="off"
+            required
+            autofocus
+          />
+          <button id="sendBtn" type="submit" class="btn btn-primary px-4 d-flex align-items-center gap-2">
+            <span id="sendBtnText">Send</span>
+            <i id="sendBtnIcon" class="bi bi-send-fill"></i>
+            <span id="sendSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+          </button>
+        </form>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="text-center py-2 text-muted small">
+      <span>AI Agent Architecture: HTML5 UI ➔ Express API ➔ Intent Planner ➔ Tool Registry ➔ Response Synthesizer</span>
+    </footer>
+  </div>
+
+  <!-- Bootstrap 5 JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Application Script -->
+    <!-- Embedded Application Script from app.js -->
+  <script>
+/**
+ * AI Personal Assistant — Frontend Client Script
+ * 
+ * Manages chat interactions, conversation memory, tool activity updates,
+ * and API communication with the Node.js agent backend.
+ */
+
+// Determine API base URL (works whether served by backend on :5000 or opened directly)
+const API_URL = (window.location.protocol === 'file:') ? 'http://localhost:5000/api/chat' : '/api/chat';
+
+// State
+let conversationHistory = [];
+let isThinking = false;
+
+// DOM Elements
+const messagesViewport = document.getElementById('messagesViewport');
+const welcomeBanner = document.getElementById('welcomeBanner');
+const chatForm = document.getElementById('chatForm');
+const messageInput = document.getElementById('messageInput');
+const sendBtn = document.getElementById('sendBtn');
+const sendBtnText = document.getElementById('sendBtnText');
+const sendBtnIcon = document.getElementById('sendBtnIcon');
+const sendSpinner = document.getElementById('sendSpinner');
+const clearChatBtn = document.getElementById('clearChatBtn');
+const activityPanelContainer = document.getElementById('activityPanelContainer');
+const activityStepsList = document.getElementById('activityStepsList');
+const activityToolBadge = document.getElementById('activityToolBadge');
+
+/**
+ * Formats step text with appropriate icon
+ */
+function getStepIcon(stepText) {
+  if (stepText.startsWith('Received')) return 'bi-box-arrow-in-right text-muted';
+  if (stepText.startsWith('Analyzed') || stepText.startsWith('Planned')) return 'bi-diagram-3-fill text-primary';
+  if (stepText.startsWith('Selected tool') || stepText.startsWith('Executed')) return 'bi-gear-wide-connected text-success';
+  if (stepText.startsWith('Synthesizing') || stepText.startsWith('Generated')) return 'bi-chat-left-text-fill text-info';
+  return 'bi-check-circle-fill text-success';
+}
+
+/**
+ * Returns tool badge HTML based on tool name
+ */
+function getToolBadgeHtml(tool) {
+  if (!tool) return '';
+  let badgeClass = 'tool-badge';
+  let icon = 'bi-gear';
+  let label = tool;
+
+  if (tool === 'calculator') {
+    badgeClass += ' tool-badge-calculator';
+    icon = 'bi-calculator-fill';
+    label = 'Used Calculator Tool';
+  } else if (tool === 'dateTime') {
+    badgeClass += ' tool-badge-dateTime';
+    icon = 'bi-calendar-check-fill';
+    label = 'Used Date & Time Tool';
+  } else if (tool === 'taskManager') {
+    badgeClass += ' tool-badge-taskManager';
+    icon = 'bi-card-checklist';
+    label = 'Used Task Manager Tool';
+  }
+
+  return `
+    <div class="${badgeClass}">
+      <i class="bi ${icon}"></i>
+      <span>${label}</span>
+    </div>
+  `;
+}
+
+/**
+ * Updates the live Agent Activity trace panel
+ */
+function updateActivityPanel(steps, toolUsed, loading) {
+  if ((!steps || steps.length === 0) && !loading) {
+    activityPanelContainer.classList.add('d-none');
+    return;
+  }
+
+  activityPanelContainer.classList.remove('d-none');
+  activityStepsList.innerHTML = '';
+
+  // Tool badge on top right
+  if (toolUsed) {
+    activityToolBadge.classList.remove('d-none');
+    activityToolBadge.innerHTML = `<i class="bi bi-gear-fill me-1"></i> Tool: <strong>${toolUsed}</strong>`;
+  } else {
+    activityToolBadge.classList.add('d-none');
+  }
+
+  // Steps
+  (steps || []).forEach(step => {
+    const stepDiv = document.createElement('div');
+    stepDiv.className = 'activity-step';
+    stepDiv.innerHTML = `<i class="bi ${getStepIcon(step)}"></i> <span class="small">${escapeHtml(step)}</span>`;
+    activityStepsList.appendChild(stepDiv);
+  });
+
+  if (loading) {
+    const loadingDiv = document.createElement('div');
+    loadingDiv.className = 'activity-step text-primary';
+    loadingDiv.innerHTML = `
+      <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+      <span class="small fw-semibold">Agent is reasoning & orchestrating tools...</span>
+    `;
+    activityStepsList.appendChild(loadingDiv);
+  }
+}
+
+/**
+ * Escapes HTML characters to prevent XSS
+ */
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+/**
+ * Appends a message bubble to the chat viewport
+ */
+function appendMessage(role, content, toolUsed = null) {
+  if (welcomeBanner) {
+    welcomeBanner.classList.add('d-none');
+  }
+
+  const isUser = role === 'user';
+  const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  const row = document.createElement('div');
+  row.className = `message-row ${isUser ? 'user-row' : 'bot-row'}`;
+
+  const inner = document.createElement('div');
+  inner.className = 'd-flex align-items-start gap-2';
+  inner.style.maxWidth = '85%';
+
+  let avatarHtml = '';
+  if (isUser) {
+    avatarHtml = `
+      <div class="rounded-circle bg-secondary bg-opacity-10 text-secondary p-2 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px;">
+        <i class="bi bi-person-fill fs-5"></i>
+      </div>
+    `;
+  } else {
+    avatarHtml = `
+      <div class="rounded-circle bg-primary bg-opacity-10 text-primary p-2 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px;">
+        <i class="bi bi-robot fs-5"></i>
+      </div>
+    `;
+  }
+
+  const toolBadgeHtml = !isUser && toolUsed ? getToolBadgeHtml(toolUsed) : '';
+
+  const bubbleHtml = `
+    <div class="message-bubble">
+      ${toolBadgeHtml}
+      <div style="white-space: pre-wrap;">${escapeHtml(content)}</div>
+      <span class="message-time text-end">${timeStr}</span>
+    </div>
+  `;
+
+  if (isUser) {
+    inner.innerHTML = `${bubbleHtml}${avatarHtml}`;
+  } else {
+    inner.innerHTML = `${avatarHtml}${bubbleHtml}`;
+  }
+
+  row.appendChild(inner);
+  messagesViewport.appendChild(row);
+  scrollToBottom();
+}
+
+/**
+ * Displays thinking indicator in the chat
+ */
+let thinkingElement = null;
+
+function showThinking() {
+  if (thinkingElement) return;
+
+  const row = document.createElement('div');
+  row.className = 'message-row bot-row thinking-row';
+
+  row.innerHTML = `
+    <div class="d-flex align-items-start gap-2">
+      <div class="rounded-circle bg-primary bg-opacity-10 text-primary p-2 d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px;">
+        <i class="bi bi-robot fs-5"></i>
+      </div>
+      <div class="message-bubble">
+        <span class="small text-muted me-2">Agent is thinking</span>
+        <div class="dot-flashing"></div>
+      </div>
+    </div>
+  `;
+
+  messagesViewport.appendChild(row);
+  thinkingElement = row;
+  scrollToBottom();
+}
+
+function hideThinking() {
+  if (thinkingElement) {
+    thinkingElement.remove();
+    thinkingElement = null;
+  }
+}
+
+/**
+ * Scroll viewport to bottom
+ */
+function scrollToBottom() {
+  messagesViewport.scrollTop = messagesViewport.scrollHeight;
+}
+
+/**
+ * Set loading state on form controls
+ */
+function setLoading(loading) {
+  isThinking = loading;
+  messageInput.disabled = loading;
+  sendBtn.disabled = loading;
+
+  if (loading) {
+    sendBtnText.textContent = 'Thinking...';
+    sendBtnIcon.classList.add('d-none');
+    sendSpinner.classList.remove('d-none');
+    showThinking();
+  } else {
+    sendBtnText.textContent = 'Send';
+    sendBtnIcon.classList.remove('d-none');
+    sendSpinner.classList.add('d-none');
+    hideThinking();
+    messageInput.focus();
+  }
+}
+
+/**
+ * Sends message to agent backend
+ */
+async function sendMessage(text) {
+  const trimmed = (text || '').trim();
+  if (!trimmed || isThinking) return;
+
+  // 1. Render User Message
+  appendMessage('user', trimmed);
+  conversationHistory.push({ role: 'user', content: trimmed });
+
+  // 2. Set Loading UI & Initial Activity Trace
+  setLoading(true);
+  updateActivityPanel(['Received user request', 'Analyzing request & determining plan...'], null, true);
+
+  try {
+    const response = await fetch(API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        message: trimmed,
+        conversationHistory: conversationHistory
+      })
+    });
+
+    const data = await response.json();
+
+    if (data.success) {
+      // 3. Render Assistant Response
+      appendMessage('assistant', data.message, data.toolUsed);
+      conversationHistory.push({ role: 'assistant', content: data.message });
+
+      // 4. Update Activity Stepper
+      updateActivityPanel(data.agentSteps || [], data.toolUsed, false);
+    } else {
+      throw new Error(data.message || 'Error communicating with agent.');
+    }
+  } catch (error) {
+    console.error('Chat error:', error);
+    const friendlyError = 'Sorry, something went wrong while communicating with the agent. Please make sure the backend server is running.';
+    appendMessage('assistant', friendlyError);
+    conversationHistory.push({ role: 'assistant', content: friendlyError });
+    updateActivityPanel(['Encountered connection or processing error'], null, false);
+  } finally {
+    setLoading(false);
+  }
+}
+
+// Event Listeners
+chatForm.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const text = messageInput.value;
+  messageInput.value = '';
+  sendMessage(text);
+});
+
+// Quick suggestion chip clicks
+document.querySelectorAll('.prompt-chip').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const prompt = btn.getAttribute('data-prompt');
+    if (prompt && !isThinking) {
+      sendMessage(prompt);
+    }
+  });
+});
+
+// Clear conversation button
+clearChatBtn.addEventListener('click', () => {
+  conversationHistory = [];
+  messagesViewport.innerHTML = '';
+  if (welcomeBanner) {
+    messagesViewport.appendChild(welcomeBanner);
+    welcomeBanner.classList.remove('d-none');
+  }
+  updateActivityPanel([], null, false);
+  messageInput.focus();
+});
+
+// Initial Welcome message
+appendMessage(
+  'assistant',
+  'Hello! I am your AI Personal Assistant. I can calculate arithmetic, check the date & time, manage your tasks, and answer questions. What can I help you with today?'
+);
+  </script>
+</body>
+</html>
