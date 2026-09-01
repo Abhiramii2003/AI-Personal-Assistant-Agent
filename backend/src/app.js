@@ -10,11 +10,12 @@ const express = require('express');
 const cors = require('cors');
 const chatRoutes = require('./routes/chat');
 
+const path = require('path');
 const app = express();
 
 // Security & Middleware
 app.use(cors({
-  origin: '*', // Allow frontend development server
+  origin: '*',
   methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
@@ -34,6 +35,10 @@ app.use((req, res, next) => {
   next();
 });
 
+// Serve frontend static assets (HTML, CSS, JS)
+const frontendPath = path.join(__dirname, '../../frontend');
+app.use(express.static(frontendPath));
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({
@@ -46,8 +51,16 @@ app.get('/api/health', (req, res) => {
 // Mount chat & agent routes
 app.use('/api', chatRoutes);
 
-// 404 Handler
-app.use((req, res) => {
+// Fallback to frontend index.html for non-API GET requests
+app.get('*', (req, res, next) => {
+  if (!req.path.startsWith('/api')) {
+    return res.sendFile(path.join(frontendPath, 'index.html'));
+  }
+  next();
+});
+
+// 404 Handler for API endpoints
+app.use('/api/*', (req, res) => {
   res.status(404).json({
     success: false,
     error: `Cannot ${req.method} ${req.originalUrl}`

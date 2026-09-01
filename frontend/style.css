@@ -1,10 +1,6 @@
-/* Global styles for AI Personal Assistant */
-@import 'bootstrap/dist/css/bootstrap.min.css';
-@import 'bootstrap-icons/font/bootstrap-icons.css';
-
+/* AI Personal Assistant Stylesheet */
 :root {
   --primary-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
-  --agent-bg: #f8fafc;
   --agent-border: #e2e8f0;
   --user-bubble: #4f46e5;
   --user-text: #ffffff;
@@ -28,7 +24,7 @@ body {
   flex-direction: column;
 }
 
-/* Header styling */
+/* Header */
 .assistant-header {
   background: var(--primary-gradient);
   color: white;
@@ -134,12 +130,11 @@ body {
   border: 1px solid #a7f3d0;
 }
 
-/* Activity Banner */
+/* Activity Card */
 .activity-card {
   background-color: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
-  transition: all 0.2s ease;
 }
 
 .activity-step {

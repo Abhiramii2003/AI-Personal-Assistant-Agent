@@ -1,8 +1,8 @@
-# 🤖 AI Personal Assistant Agent — React + Node.js
+# 🤖 AI Personal Assistant Agent — HTML + Node.js
 
-A complete, beginner-friendly **AI Personal Assistant Agent** application built from scratch with **React (Vite + Bootstrap)** on the frontend and **Node.js (Express)** on the backend.
+A complete, beginner-friendly **AI Personal Assistant Agent** application built from scratch with **HTML5, CSS3, and JavaScript (Bootstrap 5)** on the frontend and **Node.js (Express)** on the backend.
 
-This project is specifically designed to help you understand how **AI Agents**, **Tools**, **Planning**, **Agent Workflows**, and **Orchestration** work in practice without complex abstractions or heavy frameworks.
+This project is specifically designed to help you understand how **AI Agents**, **Tools**, **Planning**, **Agent Workflows**, and **Orchestration** work in practice with zero-build simplicity.
 
 ---
 
@@ -103,7 +103,7 @@ An **Agent Workflow** is the structured series of steps an agent follows to turn
 └───────────┬────────────┘
             ▼
 ┌────────────────────────┐
-│   6. Final Response    │ (Delivered to React UI with activity trace)
+│   6. Final Response    │ (Delivered to HTML UI with activity trace)
 └────────────────────────┘
 ```
 
@@ -127,8 +127,10 @@ The **Orchestration Layer (`agent.js`)**:
 
 ```text
 ┌────────────────────────────────────────────────────────┐
-│                   React Frontend (Vite)                │
-│  [ChatWindow]     [ToolActivity]      [InputBox]       │
+│             Vanilla HTML Frontend (Zero-Build)         │
+│  - index.html (Semantic UI + Bootstrap 5)              │
+│  - style.css  (Modern aesthetic & animations)          │
+│  - app.js     (State, Fetch API, Live Activity Trace)  │
 └───────────────────────────┬────────────────────────────┘
                             │ HTTP POST /api/chat
                             │ { message, conversationHistory }
@@ -162,20 +164,9 @@ The **Orchestration Layer (`agent.js`)**:
 ai-agent/
 │
 ├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── ChatWindow.jsx    # Displays conversation history with auto-scroll
-│   │   │   ├── Message.jsx       # Renders individual user/agent bubbles & tool badges
-│   │   │   ├── InputBox.jsx      # Input field, Send button, and quick suggestion chips
-│   │   │   └── ToolActivity.jsx  # Live agent trace showing planning & tool execution
-│   │   │
-│   │   ├── App.jsx               # Main state manager (messages, loading, history)
-│   │   ├── main.jsx              # React DOM entry point
-│   │   └── index.css             # Bootstrap styling and animations
-│   │
-│   ├── package.json              # Frontend dependencies (React, Bootstrap, Axios)
-│   ├── vite.config.js            # Vite configuration with API proxy to port 5000
-│   └── index.html                # HTML entry point
+│   ├── index.html                # Semantic HTML5 UI with Bootstrap 5
+│   ├── style.css                 # Clean CSS styling, animations & badges
+│   └── app.js                    # Vanilla JS chat manager & live activity trace
 │
 ├── backend/
 │   ├── src/
@@ -195,7 +186,7 @@ ai-agent/
 │   │   ├── services/
 │   │   │   └── llm.js            # Isolated LLM client + offline heuristic fallback
 │   │   │
-│   │   ├── app.js                # Express app configuration and middleware
+│   │   ├── app.js                # Express app configuration and static serving
 │   │   ├── server.js             # Server listener entry point
 │   │   └── test-agent.js         # Automated backend test suite
 │   │
@@ -214,9 +205,9 @@ ai-agent/
 Let's trace what happens when you type: **"What is 25 * 48?"**
 
 ```text
-1. User types "What is 25 * 48?" in React InputBox and clicks Send.
+1. User types "What is 25 * 48?" in the HTML input field and clicks Send.
    ↓
-2. React frontend sends HTTP POST /api/chat:
+2. Frontend JavaScript sends HTTP POST /api/chat:
    {
      "message": "What is 25 * 48?",
      "conversationHistory": [...]
@@ -259,7 +250,7 @@ Let's trace what happens when you type: **"What is 25 * 48?"**
      ]
    }
    ↓
-10. React receives the response:
+10. HTML UI receives the response:
     - Adds the message bubble with the "⚡ Used Calculator Tool" badge.
     - Updates the "Agent Activity" trace panel showing the exact step-by-step reasoning.
 ```
@@ -278,13 +269,7 @@ cd backend
 npm install
 ```
 
-### Step 2: Install Frontend Dependencies
-```bash
-cd ../frontend
-npm install
-```
-
-### Step 3: Configure Environment Variables (Optional)
+### Step 2: Configure Environment Variables (Optional)
 In `backend/.env`:
 ```env
 PORT=5000
@@ -303,22 +288,16 @@ LLM_MODEL=gpt-4o-mini
 
 ## 10. Running the Application
 
-### Start the Backend Server
+### Start the Application (One Command!)
 In the `backend/` folder:
 ```bash
 npm run dev
 ```
 *(Or `npm start`)*
-Backend will start on: **http://localhost:5000**
 
-### Start the Frontend Client
-In a separate terminal, inside the `frontend/` folder:
-```bash
-npm run dev
-```
-Frontend will start on: **http://localhost:3000**
+Open your browser and navigate to: **http://localhost:5000**
 
-Open your browser and navigate to **http://localhost:3000**.
+The Express server automatically serves the HTML/CSS/JS frontend directly at `http://localhost:5000`. You can also open `frontend/index.html` directly in any web browser.
 
 ---
 
@@ -333,10 +312,10 @@ Use these test queries to verify every feature of the agent:
 | **3. Calculator (Percentage)** | `20% of 500` | Computes `100` | `calculator` |
 | **4. Date Query** | `What is today's date?` | Returns current date (e.g. Tuesday, September 1, 2026) | `dateTime` |
 | **5. Time Query** | `What time is it?` | Returns current time and timezone | `dateTime` |
-| **6. Add Task** | `Add "Learn React" to my tasks` | Adds task to list and confirms | `taskManager` |
+| **6. Add Task** | `Add "Learn JavaScript" to my tasks` | Adds task to list and confirms | `taskManager` |
 | **7. List Tasks** | `Show my tasks` | Lists all tasks with checkboxes `[ ]` / `[✓]` | `taskManager` |
-| **8. Complete Task** | `Complete Learn React` | Marks the task as completed `[✓]` | `taskManager` |
-| **9. Delete Task** | `Delete Learn React` | Removes the task from the list | `taskManager` |
+| **8. Complete Task** | `Complete Learn JavaScript` | Marks the task as completed `[✓]` | `taskManager` |
+| **9. Delete Task** | `Delete Learn JavaScript` | Removes the task from the list | `taskManager` |
 | **10. Conversation Memory** | 1. `My name is Abhirami.`<br>2. `What is my name?` | Recalls name from conversation history | `None (Direct LLM)` |
 | **11. Knowledge Query** | `Explain what an AI agent is.` | Explains concept without invoking a tool | `None (Direct LLM)` |
 
@@ -360,8 +339,6 @@ This runs 28 automated test assertions verifying the calculator, datetime, task 
 ---
 
 ## 13. Future Learning Roadmap
-
-Once you have mastered this foundation, here is the recommended progression:
 
 ```text
 Level 1: Simple Single Agent (This Project)
@@ -389,8 +366,8 @@ Level 6: Multi-Agent Systems
 
 | Concept | Location in Project | What It Does |
 | :--- | :--- | :--- |
-| **Frontend** | `frontend/src/App.jsx` | Renders UI, tracks conversation history, sends API requests. |
-| **Backend** | `backend/src/app.js` & `server.js` | Express HTTP server handling `/api/chat`. |
+| **Frontend** | `frontend/index.html` & `app.js` | Renders UI, tracks conversation history, sends API requests. |
+| **Backend** | `backend/src/app.js` & `server.js` | Express HTTP server handling `/api/chat` and serving static files. |
 | **LLM Service** | `backend/src/services/llm.js` | Communicates with the model for planning and synthesis. |
 | **Planner** | `backend/src/agent/planner.js` | Analyzes intent and generates structured JSON action plans. |
 | **Tools** | `backend/src/tools/*.js` | Safe functions for math, date/time, and task management. |
