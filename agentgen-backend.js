@@ -1,46 +1,25 @@
 /**
  * ============================================================================
- * AI Personal Assistant Agent — Consolidated Standalone Backend (AgentGen)
+ * AI Personal Assistant Agent — AgentGen Custom Router Backend
  * ============================================================================
  * 
- * Standalone consolidated backend containing:
- * 1. Express Server & CORS Middleware
- * 2. API Routes (/api/chat, /api/tasks, /api/health)
- * 3. AI Agent Orchestration Loop (agent.js)
- * 4. Intent Planning & Structured JSON Plan Generation (planner.js)
- * 5. Tool Registry & Safe Execution (executor.js)
- * 6. LLM Integration Service with Offline Simulation Fallback (llm.js)
- * 7. Safe Arithmetic Calculator Tool (calculator.js)
- * 8. Date & Time Tool (dateTime.js)
- * 9. In-Memory Task Manager Tool (taskManager.js)
- * 
- * Required npm dependencies: express, cors, dotenv, axios
- * Environment variables: PORT, LLM_API_KEY, LLM_BASE_URL, LLM_MODEL
- * 
- * Compatible with standalone node execution and AgentGen single-file backend upload.
+ * Specifically designed for AgentGen platform upload:
+ * - Uses Express Router pattern: const router = express.Router()
+ * - Exports: module.exports = router
+ * - NO forbidden modules (NO fs, NO child_process, NO os, NO process import)
+ * - Contains all Agent Planning, Execution, Tools, and LLM orchestration
  * ============================================================================
  */
 
-// Safely load .env if available (optional in cloud platforms like AgentGen)
-try {
-  require('dotenv').config();
-} catch (e) {
-  // Ignore if dotenv is not installed in the deployment environment
-}
-
-const path = require('path');
-const fs = require('fs');
 const express = require('express');
-const cors = require('cors');
 const axios = require('axios');
 
-// ============================================================================
-// CONFIGURATION & SECRETS
-// ============================================================================
-const PORT = process.env.PORT || 5000;
-const API_KEY = process.env.LLM_API_KEY || '';
-const BASE_URL = (process.env.LLM_BASE_URL || 'https://api.openai.com/v1').replace(/\/+$/, '');
-const MODEL = process.env.LLM_MODEL || 'gpt-4o-mini';
+const router = express.Router();
+
+// Configuration & Secrets from Platform Environment
+const API_KEY = (typeof process !== 'undefined' && process.env && process.env.LLM_API_KEY) ? process.env.LLM_API_KEY : '';
+const BASE_URL = ((typeof process !== 'undefined' && process.env && process.env.LLM_BASE_URL) ? process.env.LLM_BASE_URL : 'https://api.openai.com/v1').replace(/\/+$/, '');
+const MODEL = (typeof process !== 'undefined' && process.env && process.env.LLM_MODEL) ? process.env.LLM_MODEL : 'gpt-4o-mini';
 // ============================================================================
 // Module: backend/src/tools/calculator.js
 // ============================================================================
@@ -1246,51 +1225,26 @@ async function runAgent(userMessage, conversationHistory = []) {
 
 
 // ============================================================================
-// EXPRESS APPLICATION & ROUTER SETUP
+// AGENTGEN ROUTER ENDPOINTS
 // ============================================================================
 
-const app = express();
-
-app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
-
-app.use(express.json({ limit: '1mb' }));
-app.use(express.urlencoded({ extended: true }));
-
-app.use((req, res, next) => {
-  const start = Date.now();
-  res.on('finish', () => {
-    if (req.path.startsWith('/api')) {
-      console.log(`[HTTP] ${req.method} ${req.originalUrl} ${res.statusCode} (${Date.now() - start}ms)`);
-    }
-  });
-  next();
-});
-
-const frontendCandidates = [
-  path.join(__dirname, 'frontend'),
-  path.join(__dirname, '../frontend'),
-  path.join(__dirname, 'public')
-];
-const frontendPath = frontendCandidates.find(p => fs.existsSync(p));
-if (frontendPath) {
-  app.use(express.static(frontendPath));
-}
-
-app.get('/api/health', (req, res) => {
+// Health Check
+const handleHealth = (req, res) => {
   res.json({
     status: 'ok',
+    message: 'Hello from the custom agent backend!',
     timestamp: new Date().toISOString(),
-    service: 'AI Personal Assistant Agent (AgentGen Consolidated Backend)'
+    service: 'AI Personal Assistant Agent'
   });
-});
+};
+router.get('/api/health', handleHealth);
+router.get('/health', handleHealth);
+router.get('/api/custom-endpoint', handleHealth);
 
-app.post('/api/chat', async (req, res) => {
+// Chat Endpoint
+const handleChat = async (req, res) => {
   try {
-    const { message, conversationHistory } = req.body;
+    const { message, conversationHistory } = req.body || {};
 
     if (!message || typeof message !== 'string' || message.trim().length === 0) {
       return res.status(400).json({
@@ -1325,69 +1279,34 @@ app.post('/api/chat', async (req, res) => {
       agentSteps: ['Internal server error encountered']
     });
   }
-});
+};
+router.post('/api/chat', handleChat);
+router.post('/chat', handleChat);
 
-app.get('/api/tasks', (req, res) => {
+// Task Management Endpoints
+const handleGetTasks = (req, res) => {
   res.json({
     success: true,
     tasks: getTasks()
   });
-});
+};
+router.get('/api/tasks', handleGetTasks);
+router.get('/tasks', handleGetTasks);
 
-app.delete('/api/tasks', (req, res) => {
+const handleDeleteTasks = (req, res) => {
   const result = clearTasks();
   res.json(result);
-});
-
-app.get('*', (req, res, next) => {
-  if (!req.path.startsWith('/api') && frontendPath) {
-    const indexPath = path.join(frontendPath, 'index.html');
-    if (fs.existsSync(indexPath)) {
-      return res.sendFile(indexPath);
-    }
-  }
-  next();
-});
-
-app.use('/api/*', (req, res) => {
-  res.status(404).json({
-    success: false,
-    error: `Cannot ${req.method} ${req.originalUrl}`
-  });
-});
-
-app.use((err, req, res, next) => {
-  console.error('[App] Uncaught Express error:', err);
-  res.status(500).json({
-    success: false,
-    error: 'Internal server error occurred.'
-  });
-});
-
-if (require.main === module) {
-  app.listen(PORT, () => {
-    console.log('====================================================');
-    console.log(`🤖 AI Personal Assistant Agent (AgentGen Backend)`);
-    console.log(`📡 URL: http://localhost:${PORT}`);
-    console.log(`🩺 Health check: http://localhost:${PORT}/api/health`);
-    console.log(`💬 Chat endpoint: POST http://localhost:${PORT}/api/chat`);
-    console.log(`🔑 LLM Provider: ${MODEL} (${API_KEY ? 'Active API Key' : 'Built-in Simulation Mode'})`);
-    console.log('====================================================');
-  });
-}
-
-module.exports = {
-  app,
-  runAgent,
-  calculate,
-  getCurrentDateTime,
-  addTask,
-  listTasks,
-  completeTask,
-  deleteTask,
-  clearTasks,
-  getTasks,
-  createPlan,
-  executePlan,
-  toolRegistry
 };
+router.delete('/api/tasks', handleDeleteTasks);
+router.delete('/tasks', handleDeleteTasks);
+
+// Example AgentGen required template endpoints
+router.post('/api/your-endpoint', (req, res) => {
+  res.json({ success: true, message: 'Agent backend operational' });
+});
+
+// ============================================================================
+// EXPORT ROUTER (Required by AgentGen)
+// ============================================================================
+
+module.exports = router;
